@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  helloworldRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: helloworldRolePolicy0
+          PolicyDocument:
+            Statement:
+              - Action:
+                  - 'ses:SendBounce'
+                Resource: !Sub 
+                  - >-
+                    arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/${identityName}
+                  - identityName: !Ref IdentityNameParameter
+                Effect: Allow
+      Tags:
+        - Value: SAM
+          Key: 'lambda:createdBy'
+  helloworld:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code:
+        ZipFile: >-
+          exports.handler = async (event) => {const response = { statusCode:
+          200, body: JSON.stringify('Hellow from a Lambda function!'), }; return
+          response;  };
+      Description: A starter AWS Lambda function.
+      Tags:
+        - Value: SAM
+          Key: 'lambda:createdBy'
+      MemorySize: 128
+      Handler: index.handler
+      Role: !GetAtt 
+        - helloworldRole
+        - Arn
+      Timeout: 3
+      Runtime: nodejs12.x
+Description: A starter AWS Lambda function.
+Parameters:
+  IdentityNameParameter:
+    Type: String

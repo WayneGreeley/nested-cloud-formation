@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  EmailAddress:
+    Type: String
+    Description: Enter email for SNS Subscription
+  myBucketName:
+    Type: String
+    Description: Enter bucket name
+    Default: default
+Resources:
+  myS3Stack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: !Sub 'https://s3.amazonaws.com/${myBucketName}/s3static.yml'
+      TimeoutInMinutes: '60'
+  mySNSStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      Parameters:
+        SNSEmail: !Ref EmailAddress
+      TemplateURL: !Sub 'https://s3.amazonaws.com/${myBucketName}/sns.yml'
+      TimeoutInMinutes: '60'
+Outputs:
+  myS3StackRef:
+    Value: !Ref myS3Stack
+  myOutputBucketName:
+    Value: !Sub 'https://s3.amazonaws.com/${myBucketName}/s3static.yml'
+  myS3StackWebsiteURL:
+    Value: !GetAtt myS3Stack.Outputs.WebsiteURL
+  mySNSStackRef:
+    Value: !Ref mySNSStack
