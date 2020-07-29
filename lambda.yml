@@ -32,6 +32,8 @@ Resources:
     Type: 'AWS::Lambda::Function'
     Properties:
       Code:
+        #S3Bucket: '2020-07-29-mybucket'
+        #S3Key: 'function.zip'        
         ZipFile: >-
           exports.handler = async (event) => {const response = { statusCode:
           200, body: JSON.stringify('Hellow from a Lambda function!'), }; return
